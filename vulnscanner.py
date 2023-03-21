@@ -43,6 +43,7 @@ def main(target):
         3: '-Pn -sS -sU -T4 -A -v',
         4: '-Pn -p- -T4 -A -v',
         5: '-Pn -sS -sU -T4 -A -PE -PP -PS80,443 -PA3389 -PU40125 -PY -g 53 --script=vuln'
+        6: '-Pn -sV --min-rate=5000 --script=vulners'
     }
 
     print("Available scan profiles:")
@@ -51,6 +52,7 @@ def main(target):
     print("3. Stealth scan with UDP")
     print("4. Full port range scan")
     print("5. Stealth and UDP scan with version detection and OS detection")
+    print("6. Vulnerability scan")
 
     try:
         profile = int(input("Enter profile of scan: "))
