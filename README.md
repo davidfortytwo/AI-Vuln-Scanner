@@ -12,11 +12,11 @@ This AI-Integrated Vulnerability Scanner is a Python-based script that combines 
 
 4. Install the required packages using pip:
 
-    pip install -r requirements.txt
+        pip install -r requirements.txt
 
 5. Add your OpenAI API key to a .env file in the root folder (optional, the script asks for the API key if no .env found):
 
-    OPENAI_API_KEY=your_api_key_here
+        OPENAI_API_KEY=your_api_key_here
 
 Replace your_api_key_here with your actual OpenAI API key.
 
@@ -26,7 +26,7 @@ Replace your_api_key_here with your actual OpenAI API key.
 
 2. Run the script with the required target and optional output format:
     
-    python vulnscanner.py -t target_ip_or_hostname -o output_format
+        python vulnscanner.py -t target_ip_or_hostname -o output_format
 
 Replace target_ip_or_hostname with the target's IP address or hostname, and output_format with the desired output format (html, csv, xml, txt, or json). If no output format is specified, the default format is 'html'.
 
@@ -35,7 +35,7 @@ The script will perform the scan and display the results on the screen. It will 
 
 Example:
 
-    python vulnscanner.py -t 192.168.1.1 -o html
+        python vulnscanner.py -t 192.168.1.1 -o html
 
 This command will perform a vulnerability scan on the IP address 192.168.1.1 and save the results in an HTML file.
 
