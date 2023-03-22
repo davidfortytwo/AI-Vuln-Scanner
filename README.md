@@ -14,7 +14,7 @@ This AI-Integrated Vulnerability Scanner is a Python-based script that combines 
 
     pip install -r requirements.txt
 
-5. Add your OpenAI API key to a .env file in the root folder:
+5. Add your OpenAI API key to a .env file in the root folder (optional, the script asks for the API key if no .env found):
 
     OPENAI_API_KEY=your_api_key_here
 
