@@ -15,6 +15,9 @@ openai.api_key = os.environ.get('OPENAI_API_KEY')
 if not openai.api_key:
     openai.api_key = input("Enter your OpenAI API key: ")
 
+    with open('.env', 'a') as f:
+        f.write(f"\nOPENAI_API_KEY={openai.api_key}")
+
 MODEL_ENGINE = "text-davinci-003"
 TEMPERATURE = 0.5
 TOKEN_LIMIT = 2048
@@ -32,6 +35,8 @@ def scan(ip, arguments):
     nm.scan(ip, arguments)
     json_data = nm.analyse_nmap_xml_scan()
     analyze = json_data["scan"]
+
+    open_ports = extract_open_ports(analyze)
 
     # Print Nmap scan results on screen
     print("\nNmap Scan Results and Vulnerabilities:")
@@ -138,6 +143,16 @@ def is_valid_json(json_string):
         return isinstance(data, dict) or (isinstance(data, list) and len(data) > 0)
     except json.JSONDecodeError:
         return False
+
+def extract_open_ports(analyze):
+    open_ports_info = []
+    for host, host_data in analyze.items():
+        for key, value in host_data.items():
+            if key == "tcp" or key == "udp":
+                for port, port_data in value.items():
+                    if port_data.get('state') == 'open':
+                        open_ports_info.append(f"{key.upper()} Port {port}: {port_data['name']}")
+    return ', '.join(open_ports_info)
 
 def main(target, output_format):
     profiles = {
