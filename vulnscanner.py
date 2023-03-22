@@ -63,6 +63,9 @@ For each identified vulnerability, include:
 3. Evidences
 4. Relevant references to OWASP ASVS, WSTG, CAPEC, and CWE, with each reference formatted as a clickable hyperlink
 
+Based on the following open ports and services detected:
+{open_ports}
+
 Return the results as a well-formatted HTML snippet with line breaks (<br>) separating each section.
 """
 
@@ -142,7 +145,8 @@ def main(target, output_format):
         2: '-Pn -T4 -A -vvv',
         3: '-Pn -sS -sU -T4 -A -vvv',
         4: '-Pn -p- -T4 -A -vvv',
-        5: '-Pn -sS -sU -T4 -A -PE -PP -PS80,443 -PA3389 -PU40125 -PY -g 53 --script=vuln -vvv'
+        5: '-Pn -sS -sU -T4 -A -PE -PP -PS80,443 -PA3389 -PU40125 -PY -g 53 --script=vuln -vvv',
+        6: '-Pn -sS -sU --script=vulners --min-rate=5000 -p- -vvv'
     }
 
     print("Available scan profiles:")
@@ -151,6 +155,7 @@ def main(target, output_format):
     print("3. Stealth scan with UDP")
     print("4. Full port range scan")
     print("5. Stealth and UDP scan with version detection and OS detection")
+    print("6. Vulnerability scan against all TCP and UDP ports")
 
     try:
         profile = int(input("Enter profile of scan: "))
