@@ -15,6 +15,10 @@ openai.api_key = os.environ.get('OPENAI_API_KEY')
 if not openai.api_key:
     openai.api_key = input("Enter your OpenAI API key: ")
 
+    # Save the API key to the .env file
+    with open('.env', 'a') as f:
+        f.write(f"\nOPENAI_API_KEY={openai.api_key}")
+
 MODEL_ENGINE = "text-davinci-003"
 TEMPERATURE = 0.5
 TOKEN_LIMIT = 2048
