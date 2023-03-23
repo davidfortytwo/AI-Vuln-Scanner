@@ -198,8 +198,7 @@ def main(target, output_format):
     soup = BeautifulSoup(final, "html.parser")
     plain_text_results = soup.get_text()
 
-    formatted_results = plain_text_results.replace("\n", " · ")
-    print(formatted_results)
+    print(plain_text_results)
 
     timestamp = time.strftime("%Y%m%d-%H%M%S")
     filename = f"{target}-{timestamp}.{output_format}"
