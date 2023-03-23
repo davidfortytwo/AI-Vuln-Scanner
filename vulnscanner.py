@@ -28,30 +28,27 @@ args = parser.parse_args()
 target = args.target
 output_format = args.output.lower()
 
+def extract_open_ports(analyze):
+    open_ports_info = []
+    for host, host_data in analyze.items():
+        for key, value in host_data.items():
+            if key == "tcp" or key == "udp":
+                for port, port_data in value.items():
+                    if port_data.get('state') == 'open':
+                        open_ports_info.append({
+                            'host': host,
+                            'protocol': key.upper(),
+                            'port': port,
+                            'service': port_data['name']
+                        })
+    return open_ports_info
+
 def scan(ip, arguments):
     nm.scan(ip, arguments)
     json_data = nm.analyse_nmap_xml_scan()
     analyze = json_data["scan"]
 
-    # Print Nmap scan results on screen
-    print("\nNmap Scan Results and Vulnerabilities:")
-    for host, host_data in analyze.items():
-        print(f"Host: {host}")
-        for key, value in host_data.items():
-            if key == "hostnames":
-                print(f"Hostnames: {', '.join(value)}")
-            elif key == "addresses":
-                for addr_type, addr in value.items():
-                    print(f"{addr_type.capitalize()} Address: {addr}")
-            elif key == "tcp" or key == "udp":
-                print(f"{key.upper()} Ports:")
-                for port, port_data in value.items():
-                    print(f"  Port {port}:")
-                    for port_key, port_value in port_data.items():
-                        print(f"    {port_key.capitalize()}: {port_value}")
-            else:
-                print(f"{key.capitalize()}: {value}")
-        print("\n")
+    open_ports = extract_open_ports(analyze)
 
     prompt = f"""
 Please perform a vulnerability analysis of the following network scan results:
@@ -64,7 +61,7 @@ For each identified vulnerability, include:
 4. Relevant references to OWASP ASVS, WSTG, CAPEC, and CWE, with each reference formatted as a clickable hyperlink
 
 Based on the following open ports and services detected:
-{open_ports}
+{json.dumps(open_ports)}
 
 Return the results as a well-formatted HTML snippet with line breaks (<br>) separating each section.
 """
@@ -197,7 +194,8 @@ def main(target, output_format):
     soup = BeautifulSoup(final, "html.parser")
     plain_text_results = soup.get_text()
 
-    print(plain_text_results)
+    formatted_results = plain_text_results.replace("\n", " · ")
+    print(formatted_results)
 
     timestamp = time.strftime("%Y%m%d-%H%M%S")
     filename = f"{target}-{timestamp}.{output_format}"
