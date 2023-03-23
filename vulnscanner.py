@@ -49,14 +49,17 @@ def extract_open_ports(analyze):
 
 def scan(ip, arguments):
     nm.scan(ip, arguments)
-    json_data = nm.analyse_nmap_xml_scan()
-    analyze = json_data["scan"]
+    xml_data = nm.get_nmap_last_output()
+    xml_dict = xmltodict.parse(xml_data)
+    analyze = xml_dict['nmaprun']['host']
+    
+    analyze_json = convert_xml_to_json(analyze)
 
     open_ports = extract_open_ports(analyze)
 
     prompt = f"""
 Please perform a vulnerability analysis of the following network scan results:
-{analyze}
+{json.dumps(analyze_json)}
 
 For each identified vulnerability, include:
 1. A detailed description of the vulnerability
@@ -81,6 +84,21 @@ Return the results as a well-formatted HTML snippet with line breaks (<br>) sepa
     response = completion.choices[0].text
     # Return both the response and the analyze data
     return response, analyze
+
+def convert_xml_to_json(analyze):
+    if isinstance(analyze, list):
+        return [convert_xml_to_json(item) for item in analyze]
+    elif isinstance(analyze, dict):
+        result = {}
+        for key, value in analyze.items():
+            if '@' in key:
+                new_key = key.replace('@', '')
+            else:
+                new_key = key
+            result[new_key] = convert_xml_to_json(value)
+        return result
+    else:
+        return analyze
 
 def export_to_csv(data, filename):
     import csv
