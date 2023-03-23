@@ -8,6 +8,7 @@ import time
 from jinja2 import Template
 from dotenv import load_dotenv
 from bs4 import BeautifulSoup
+import xmltodict
 
 load_dotenv()
 
