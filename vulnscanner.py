@@ -156,13 +156,26 @@ def is_valid_json(json_string):
         return False
 
 def main(target, output_format):
+    banner = r"""
+
+ █████╗ ██╗    ██╗   ██╗██╗   ██╗██╗     ███╗   ██╗    ███████╗ ██████╗ █████╗ ███╗   ██╗███╗   ██╗███████╗██████╗ 
+██╔══██╗██║    ██║   ██║██║   ██║██║     ████╗  ██║    ██╔════╝██╔════╝██╔══██╗████╗  ██║████╗  ██║██╔════╝██╔══██╗
+███████║██║    ██║   ██║██║   ██║██║     ██╔██╗ ██║    ███████╗██║     ███████║██╔██╗ ██║██╔██╗ ██║█████╗  ██████╔╝
+██╔══██║██║    ╚██╗ ██╔╝██║   ██║██║     ██║╚██╗██║    ╚════██║██║     ██╔══██║██║╚██╗██║██║╚██╗██║██╔══╝  ██╔══██╗
+██║  ██║██║     ╚████╔╝ ╚██████╔╝███████╗██║ ╚████║    ███████║╚██████╗██║  ██║██║ ╚████║██║ ╚████║███████╗██║  ██║
+╚═╝  ╚═╝╚═╝      ╚═══╝   ╚═════╝ ╚══════╝╚═╝  ╚═══╝    ╚══════╝ ╚═════╝╚═╝  ╚═╝╚═╝  ╚═══╝╚═╝  ╚═══╝╚══════╝╚═╝  ╚═╝
+by cbk914
+"""
+    print(banner)  
     profiles = {
         1: '-Pn -sV -T4 -O -F -vvv',
         2: '-Pn -T4 -A -vvv',
         3: '-Pn -sS -sU -T4 -A -vvv',
         4: '-Pn -p- -T4 -A -vvv',
         5: '-Pn -sS -sU -T4 -A -PE -PP -PS80,443 -PA3389 -PU40125 -PY -g 53 --script=vuln -vvv',
-        6: '-Pn -sS -sU --script=vulners --min-rate=5000 -p- -vvv'
+        6: '-Pn -sS -sU --script=vulners --min-rate=5000 -p- -vvv',
+        7: '-Pn -T2 -f --mtu 16 -vvv',
+        8: '-sF -T4 -p- --script firewall-bypass -vvv'
     }
 
     print("Available scan profiles:")
@@ -172,6 +185,8 @@ def main(target, output_format):
     print("4. Full port range scan")
     print("5. Stealth and UDP scan with version detection and OS detection")
     print("6. Vulnerability scan against all TCP and UDP ports")
+    print("7. WAF bypass scan against all TCP ports")
+    print("8. Misconfigured firewall bypass")
 
     try:
         profile = int(input("Enter profile of scan: "))
