@@ -1,12 +1,5 @@
 # AI-Vuln-Scanner
-
- █████╗ ██╗    ██╗   ██╗██╗   ██╗██╗     ███╗   ██╗    ███████╗ ██████╗ █████╗ ███╗   ██╗███╗   ██╗███████╗██████╗ 
-██╔══██╗██║    ██║   ██║██║   ██║██║     ████╗  ██║    ██╔════╝██╔════╝██╔══██╗████╗  ██║████╗  ██║██╔════╝██╔══██╗
-███████║██║    ██║   ██║██║   ██║██║     ██╔██╗ ██║    ███████╗██║     ███████║██╔██╗ ██║██╔██╗ ██║█████╗  ██████╔╝
-██╔══██║██║    ╚██╗ ██╔╝██║   ██║██║     ██║╚██╗██║    ╚════██║██║     ██╔══██║██║╚██╗██║██║╚██╗██║██╔══╝  ██╔══██╗
-██║  ██║██║     ╚████╔╝ ╚██████╔╝███████╗██║ ╚████║    ███████║╚██████╗██║  ██║██║ ╚████║██║ ╚████║███████╗██║  ██║
-╚═╝  ╚═╝╚═╝      ╚═══╝   ╚═════╝ ╚══════╝╚═╝  ╚═══╝    ╚══════╝ ╚═════╝╚═╝  ╚═╝╚═╝  ╚═══╝╚═╝  ╚═══╝╚══════╝╚═╝  ╚═╝
-                                                                                                                   
+                                                                                                                
 This AI-Integrated Vulnerability Scanner is a Python-based script that combines the power of Nmap, a popular network scanner, with OpenAI's ChatGPT, a state-of-the-art natural language processing model. The tool performs network scans using various profiles and provides a vulnerability analysis based on the scan results. The analysis includes a detailed description of the vulnerabilities, affected endpoints, evidences, and relevant references to OWASP ASVS, WSTG, CAPEC, and CWE. The tool supports multiple output formats, including HTML, CSV, XML, TXT, and JSON.
 
 # Installation
