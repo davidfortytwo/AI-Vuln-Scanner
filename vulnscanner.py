@@ -19,12 +19,12 @@ if not openai.api_key:
     with open('.env', 'a') as f:
         f.write(f"\nOPENAI_API_KEY={openai.api_key}")
 
-MODEL_ENGINE = "text-davinci-003"
+MODEL_ENGINE = "gpt-3.5-turbo"
 TEMPERATURE = 0.5
 TOKEN_LIMIT = 2048
 nm = nmap.PortScanner()
 
-parser = argparse.ArgumentParser(description='Python-Nmap and ChatGPT integrated Vulnerability Scanner')
+parser = argparse.ArgumentParser(description='Nmap and ChatGPT integrated Vulnerability Scanner')
 parser.add_argument('-t', '--target', metavar='target', type=str, help='Target IP or hostname', required=True)
 parser.add_argument('-o', '--output', metavar='output', type=str, help='Output format (html, csv, xml, txt, json)', default='html')
 args = parser.parse_args()
@@ -46,56 +46,38 @@ def scan(ip, arguments):
     nm.scan(ip, arguments)
     json_data = nm.analyse_nmap_xml_scan()
     analyze = json_data["scan"]
+    return analyze
 
+def vulnerability_identification(target, profile_arguments, analyze):
     open_ports = extract_open_ports(analyze)
 
-    # Print Nmap scan results on screen
-    print("\nNmap Scan Results and Vulnerabilities:")
-    for host, host_data in analyze.items():
-        print(f"Host: {host}")
-        for key, value in host_data.items():
-            if key == "hostnames":
-                print(f"Hostnames: {', '.join(value)}")
-            elif key == "addresses":
-                for addr_type, addr in value.items():
-                    print(f"{addr_type.capitalize()} Address: {addr}")
-            elif key == "tcp" or key == "udp":
-                print(f"{key.upper()} Ports:")
-                for port, port_data in value.items():
-                    print(f"  Port {port}:")
-                    for port_key, port_value in port_data.items():
-                        print(f"    {port_key.capitalize()}: {port_value}")
-            else:
-                print(f"{key.capitalize()}: {value}")
-        print("\n")
-
     prompt = f"""
-Please perform a vulnerability analysis of the following network scan results:
-{analyze}
+    Please perform a vulnerability analysis of the following network scan results:
+    {analyze}
 
-For each identified vulnerability, include:
-1. A detailed description of the vulnerability
-2. The correct affected endpoint (host, port, service, etc.)
-3. Evidences
-4. Relevant references to OWASP ASVS, WSTG, CAPEC, and CWE, with each reference formatted as a clickable hyperlink
+    For each identified vulnerability, include:
+    1. A detailed description of the vulnerability
+    2. The correct affected endpoint (host, port, service, URI)
+    3. Evidences
+    4. Relevant references to OWASP ASVS, WSTG, CAPEC, and CWE, with specific reference numbers and each reference formatted as a clickable hyperlink
 
-Based on the following open ports and services detected:
-{open_ports}
+    Based on the following open ports and services detected:
+    {open_ports}
 
-Return the results as a well-formatted HTML snippet with line breaks (<br>) separating each section.
+    Return the results as a well-formatted HTML snippet with line breaks (<br>) separating each section.
 """
 
     completion = openai.Completion.create(
         engine=MODEL_ENGINE,
-        prompt=prompt,
+        messages=[{"role": "user", "content": prompt}],
         max_tokens=TOKEN_LIMIT,
         n=1,
         temperature=TEMPERATURE,
         stop=None,
     )
-    response = completion.choices[0].text
-    # Return both the response and the analyze data
-    return response, analyze
+
+    message = completion.choices[0].messages[-1]['content']
+    return message
 
 def export_to_csv(data, filename):
     import csv
@@ -180,9 +162,9 @@ def main(target, output_format):
     except ValueError:
         print("Error: Invalid profile input. Please provide a valid profile number.")
         return
-
-    final, analyze = scan(target, profiles[profile])
-
+    analyze = scan(target, profiles[profile])
+    final = vulnerability_identification(target, profiles[profile], analyze)
+    
     if is_valid_json(final):
         parsed_response = json.loads(final)
         formatted_response = json.dumps(parsed_response, indent=2)
