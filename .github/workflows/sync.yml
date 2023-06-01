@@ -1,9 +1,7 @@
 # Your GitHub Actions workflow
 name: Sync Repositories
 
-on:
-  schedule:
-    - cron: '0 0 * * *' # Runs every day at midnight
+on: [push] # This line is defining a push event trigger
 
 jobs:
   sync:
