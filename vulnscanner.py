@@ -1,3 +1,7 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+# Author: cbk914
+
 import nmap
 import openai
 import argparse
@@ -9,21 +13,26 @@ from jinja2 import Template
 from dotenv import load_dotenv
 from bs4 import BeautifulSoup
 
+# Load environment variables from .env file
 load_dotenv()
 
-openai.api_key = os.environ.get('OPENAI_API_KEY')
+# Set up OpenAI API key
+openai.api_key = os.getenv('OPENAI_API_KEY')
 if not openai.api_key:
     openai.api_key = input("Enter your OpenAI API key: ")
-
     # Save the API key to the .env file
     with open('.env', 'a') as f:
         f.write(f"\nOPENAI_API_KEY={openai.api_key}")
 
+# OpenAI model configuration
 MODEL_ENGINE = "text-davinci-003"
 TEMPERATURE = 0.5
 TOKEN_LIMIT = 2048
+
+# Initialize Nmap PortScanner
 nm = nmap.PortScanner()
 
+# Argument parser setup
 parser = argparse.ArgumentParser(description='Python-Nmap and ChatGPT integrated Vulnerability Scanner')
 parser.add_argument('-t', '--target', metavar='target', type=str, help='Target IP or hostname', required=True)
 parser.add_argument('-o', '--output', metavar='output', type=str, help='Output format (html, csv, xml, txt, json)', default='html')
@@ -36,7 +45,7 @@ def extract_open_ports(analyze):
     open_ports_info = []
     for host, host_data in analyze.items():
         for key, value in host_data.items():
-            if key == "tcp" or key == "udp":
+            if key in ["tcp", "udp"]:
                 for port, port_data in value.items():
                     if port_data.get('state') == 'open':
                         open_ports_info.append(f"{key.upper()} Port {port}: {port_data['name']}")
@@ -49,7 +58,7 @@ def scan(ip, arguments):
 
     open_ports = extract_open_ports(analyze)
 
-    # Print Nmap scan results on screen
+    # Print Nmap scan results
     print("\nNmap Scan Results and Vulnerabilities:")
     for host, host_data in analyze.items():
         print(f"Host: {host}")
@@ -59,7 +68,7 @@ def scan(ip, arguments):
             elif key == "addresses":
                 for addr_type, addr in value.items():
                     print(f"{addr_type.capitalize()} Address: {addr}")
-            elif key == "tcp" or key == "udp":
+            elif key in ["tcp", "udp"]:
                 print(f"{key.upper()} Ports:")
                 for port, port_data in value.items():
                     print(f"  Port {port}:")
@@ -94,7 +103,6 @@ Return the results as a well-formatted HTML snippet with line breaks (<br>) sepa
         stop=None,
     )
     response = completion.choices[0].text
-    # Return both the response and the analyze data
     return response, analyze
 
 def export_to_csv(data, filename):
@@ -131,11 +139,9 @@ def export_to_html(html_snippet, filename):
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
             <title>Vulnerability Report</title>
             <style>
-                {% raw %}
                 body { font-family: Arial, sans-serif; }
                 h1 { color: #333; }
                 pre { white-space: pre-wrap; word-wrap: break-word; }
-                {% endraw %}
             </style>
         </head>
         <body>
@@ -157,7 +163,6 @@ def is_valid_json(json_string):
 
 def main(target, output_format):
     banner = r"""
-
  █████╗ ██╗    ██╗   ██╗██╗   ██╗██╗     ███╗   ██╗    ███████╗ ██████╗ █████╗ ███╗   ██╗███╗   ██╗███████╗██████╗ 
 ██╔══██╗██║    ██║   ██║██║   ██║██║     ████╗  ██║    ██╔════╝██╔════╝██╔══██╗████╗  ██║████╗  ██║██╔════╝██╔══██╗
 ███████║██║    ██║   ██║██║   ██║██║     ██╔██╗ ██║    ███████╗██║     ███████║██╔██╗ ██║██╔██╗ ██║█████╗  ██████╔╝
@@ -167,6 +172,7 @@ def main(target, output_format):
 by cbk914
 """
     print(banner)  
+
     profiles = {
         1: '-Pn -sV -T4 -O -F -vvv',
         2: '-Pn -T4 -A -vvv',
@@ -204,7 +210,6 @@ by cbk914
     else:
         formatted_response = final
 
-    # Print Nmap scan results in plain text
     print("\nNmap Scan Results:")
     for host, host_data in analyze.items():
         print(f"Host: {host}")
@@ -214,7 +219,7 @@ by cbk914
             elif key == "addresses":
                 for addr_type, addr in value.items():
                     print(f"{addr_type.capitalize()} Address: {addr}")
-            elif key == "tcp" or key == "udp":
+            elif key in ["tcp", "udp"]:
                 print(f"{key.upper()} Ports:")
                 for port, port_data in value.items():
                     print(f"  Port {port}:")
@@ -224,7 +229,6 @@ by cbk914
                 print(f"{key.capitalize()}: {value}")
         print("\n")
 
-    # Parse HTML vulnerability analysis results into plain text
     soup = BeautifulSoup(final, "html.parser")
     plain_text_results = soup.get_text()
 
