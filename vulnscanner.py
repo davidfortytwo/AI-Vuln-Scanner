@@ -122,7 +122,7 @@ def is_safe_target(target):
 
 def run_nmap_scan(ip, arguments):
     try:
-        result = nm.scan_command(arguments, ip)
+        result = nm.scan_command(ip, arguments)
         if not result or ip not in result:
             logging.error("Nmap scan returned no results.")
             return {}
@@ -131,6 +131,7 @@ def run_nmap_scan(ip, arguments):
     except Exception as e:
         logging.error(f"Nmap scan failed: {e}")
         return {}
+
 
 def get_user_asset_context_and_threat_intel():
     print("Provide asset context (e.g., 'web server', 'IoT device', 'database', etc.). Leave blank to auto-detect:")
