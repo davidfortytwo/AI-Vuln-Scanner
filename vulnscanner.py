@@ -41,6 +41,30 @@ TOKEN_LIMIT = 4096
 
 nm = nmap3.Nmap()
 
+def mask_api_key(key):
+    if not key or len(key) < 8:
+        return "[NOT SET]"
+    return key[:4] + "..." + key[-4:]
+
+def validate_api_keys():
+    missing_keys = []
+    if not OPENAI_API_KEY:
+        missing_keys.append("OPENAI_API_KEY")
+    if not ANYTHINGLLM_API_KEY:
+        missing_keys.append("ANYTHINGLLM_API_KEY")
+    if not ANTHROPIC_API_KEY:
+        missing_keys.append("ANTHROPIC_API_KEY")
+    if not REPLIT_API_KEY:
+        missing_keys.append("REPLIT_API_KEY")
+
+    if missing_keys:
+        logging.warning(f"Missing API keys: {', '.join(missing_keys)}. Some functionality may be unavailable.")
+
+    logging.debug(f"OpenAI API Key: {mask_api_key(OPENAI_API_KEY)}")
+    logging.debug(f"AnythingLLM API Key: {mask_api_key(ANYTHINGLLM_API_KEY)}")
+    logging.debug(f"Anthropic API Key: {mask_api_key(ANTHROPIC_API_KEY)}")
+    logging.debug(f"Replit API Key: {mask_api_key(REPLIT_API_KEY)}")
+
 def print_ethical_warning():
     print("\n" + "="*80)
     print("WARNING: Use this script ONLY on systems you own or have explicit permission to test.")
@@ -382,6 +406,9 @@ by cbk914
 """
     print(banner)
     print_ethical_warning()
+
+    # Validate API keys early
+    validate_api_keys()
 
     profiles = {
         1: ('Fast scan', '-Pn -sV -T4 -O -F -vvv'),
