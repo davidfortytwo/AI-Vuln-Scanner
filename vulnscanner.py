@@ -71,6 +71,12 @@ def print_ethical_warning():
     print("WARNING: Use this script ONLY on systems you own or have explicit permission to test.")
     print("Unauthorized scanning is illegal and unethical.")
     print("="*80 + "\n")
+    
+def sanitize_target(target):
+    # Remove protocol prefix if present
+    target = re.sub(r'^https?://', '', target, flags=re.IGNORECASE)
+    # Strip any trailing slashes or whitespace
+    return target.strip('/')
 
 def extract_open_ports(analyze):
     open_ports_info = []
@@ -459,7 +465,11 @@ by cbk914
         logging.getLogger().setLevel(logging.DEBUG)
         logging.debug("Debug mode enabled.")
     
-    target = args.target
+    target = sanitize_target(args.target)
+
+    if not is_safe_target(target):
+        logging.error(f"Invalid target input: {args.target}. Possible injection attempt or malformed value.")
+        sys.exit(1)
     
     # Validate target input before using it anywhere
     if not is_safe_target(target):
