@@ -9,6 +9,7 @@ import logging
 import time
 import json
 import requests
+import ipaddress
 
 try:
     import nmap3
@@ -97,6 +98,21 @@ def print_scan_results(analyze):
                 service = port_entry.get('service', {}).get('name', 'unknown')
                 logging.info(f"  {protocol.upper()} Port {portid}: {service} ({state})")
         print("\n")
+
+def is_safe_target(target):
+    # Reject if any shell metacharacters exist
+    if re.search(r'[;&|`$<>]', target):
+        return False
+    # Check if it's a valid IP address
+    try:
+        ipaddress.ip_address(target)
+        return True
+    except ValueError:
+        pass
+    # Validate hostname: RFC-1123 hostname (simplified)
+    if re.match(r'^[a-zA-Z0-9.-]+$', target):
+        return True
+    return False
 
 def run_nmap_scan(ip, arguments):
     try:
@@ -438,12 +454,18 @@ by cbk914
         sys.exit(0)
 
     args = parser.parse_args()
-
+    
     if args.debug:
         logging.getLogger().setLevel(logging.DEBUG)
         logging.debug("Debug mode enabled.")
-
+    
     target = args.target
+    
+    # Validate target input before using it anywhere
+    if not is_safe_target(target):
+        logging.error(f"Invalid target input: {target}. Possible injection attempt or malformed value.")
+        sys.exit(1)
+    
     output_format = args.output.lower()
     profile_num = args.profile
 
