@@ -1,12 +1,29 @@
-python3-nmap
-jinja2
-python-dotenv
-beautifulsoup4
-requests
-# For OpenAI provider (optional, only if using OpenAI)
-openai
-aiohttp>=3.9.0 # not directly required, pinned by Snyk to avoid a vulnerability
-ipaddress
-re
-zipp>=3.19.1 # not directly required, pinned by Snyk to avoid a vulnerability
-idna>=3.15 # not directly required, pinned by Snyk to avoid a vulnerability
+# AI-Vuln-Scanner runtime dependencies.
+#
+# SYSTEM REQUIREMENT (not installable with pip): the `nmap` binary must be on
+# PATH. vulnscanner.py drives it with subprocess (module docstring: "call the
+# local `nmap` binary via subprocess (most reliable)") and parses its XML
+# output with xml.etree.ElementTree. It never imports an nmap Python binding,
+# so the old `python3-nmap` entry was unused as well as stale.
+#
+# The AI providers (OpenAI, Groq, DeepSeek) are called over plain HTTP with
+# `requests` (module docstring: "OpenAI (HTTP, no openai SDK dependency)"), so
+# no AI SDK belongs in this file. The previous `openai` entry pulled in a
+# large SDK the code never imports.
+
+jinja2==3.1.6
+python-dotenv==1.2.4
+requests==2.34.2
+urllib3==2.8.0 # imported directly for urllib3.util.retry.Retry
+
+# Transitive dependencies of requests, pinned defensively by Snyk.
+idna==3.20
+zipp==4.1.1 # not directly required, pinned by Snyk to avoid a vulnerability
+
+# Removed from this file:
+#   python3-nmap     - unused; the nmap binary is used via subprocess
+#   re               - standard library, and NOT ON PyPI ("from versions: none")
+#   ipaddress        - standard library; the PyPI backport shadows the stdlib
+#   beautifulsoup4   - never imported
+#   openai           - never imported (raw HTTP is used instead)
+#   aiohttp          - never imported
